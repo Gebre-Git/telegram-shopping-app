@@ -1,8 +1,3 @@
-export interface ProductDetails {
-  material: string;
-  fit: string;
-  care: string;
-}
 
 export interface Product {
   id: number;
@@ -10,8 +5,14 @@ export interface Product {
   price: number;
   image: string;
   category: string;
-  description: string;
-  details?: ProductDetails;
+  rating?: number;
+  reviews?: number;
+  description?: string;
+  details?: {
+    material: string;
+    fit: string;
+    care: string;
+  };
 }
 
 export interface CartItem extends Product {
@@ -19,25 +20,27 @@ export interface CartItem extends Product {
 }
 
 export enum OrderStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  REJECTED = 'REJECTED',
+  PENDING = 'Pending',
+  CONFIRMED = 'Confirmed',
+  REJECTED = 'Rejected',
 }
 
 export interface Order {
-  id: string;
+  _id?: string;
   items: CartItem[];
   total: number;
-  status: OrderStatus;
-  date: string;
+  screenshot: string; // Base64 string
+  telegramUserId: string;
   customerName: string;
+  status: OrderStatus;
+  createdAt?: string;
 }
 
-export enum View {
-  SHOP = 'SHOP',
-  CART = 'CART',
-  ADMIN = 'ADMIN',
-  PRODUCT_DETAIL = 'PRODUCT_DETAIL',
+export interface User {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
 }
 
 declare global {
@@ -46,39 +49,23 @@ declare global {
       WebApp: {
         ready: () => void;
         expand: () => void;
+        isVersionAtLeast: (version: string) => boolean;
         initDataUnsafe?: {
-          user?: {
-            first_name?: string;
-            last_name?: string;
-            username?: string;
-            id?: number;
-          };
+          user?: User;
         };
-        themeParams: {
-          bg_color?: string;
-          text_color?: string;
-          hint_color?: string;
-          link_color?: string;
-          button_color?: string;
-          button_text_color?: string;
-          secondary_bg_color?: string;
-        };
-        // Added BackButton definition to fix missing property errors
-        BackButton: {
-          isVisible: boolean;
-          onClick: (callback: () => void) => void;
-          offClick: (callback: () => void) => void;
+        MainButton: {
           show: () => void;
           hide: () => void;
+          setText: (text: string) => void;
+          onClick: (fn: () => void) => void;
+          offClick: (fn: () => void) => void;
+          showProgress: () => void;
+          hideProgress: () => void;
         };
         HapticFeedback: {
-          impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
+          impactOccurred: (style: 'light' | 'medium' | 'heavy') => void;
         };
-        showPopup: (params: {
-          title: string;
-          message: string;
-          buttons: { type: string; text?: string }[];
-        }) => void;
+        showAlert: (message: string) => void;
       };
     };
   }

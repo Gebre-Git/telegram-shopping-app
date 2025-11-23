@@ -62,10 +62,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onUpdateStatus 
         ) : (
           <div className="space-y-3">
             {[...orders].reverse().map(order => (
-              <div key={order.id} className="bg-bg border border-gray-100 rounded-xl p-4 shadow-sm">
+              <div key={order._id} className="bg-bg border border-gray-100 rounded-xl p-4 shadow-sm">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <span className="text-xs text-hint block">#{order.id.slice(0, 8)}</span>
+                    <span className="text-xs text-hint block">#{order._id?.slice(0, 8)}</span>
                     <span className="font-semibold block">{order.customerName}</span>
                   </div>
                   <span className={`text-xs font-bold px-2 py-1 rounded-full ${
@@ -92,13 +92,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ orders, onUpdateStatus 
                   {order.status === OrderStatus.PENDING && (
                     <div className="flex space-x-2">
                       <button 
-                        onClick={() => onUpdateStatus(order.id, OrderStatus.REJECTED)}
+                        onClick={() => order._id && onUpdateStatus(order._id, OrderStatus.REJECTED)}
                         className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100"
                       >
                         <XCircle size={20} />
                       </button>
                       <button 
-                        onClick={() => onUpdateStatus(order.id, OrderStatus.CONFIRMED)}
+                        onClick={() => order._id && onUpdateStatus(order._id, OrderStatus.CONFIRMED)}
                         className="p-2 text-green-500 bg-green-50 rounded-lg hover:bg-green-100"
                       >
                         <CheckCircle size={20} />

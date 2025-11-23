@@ -1,12 +1,30 @@
+
 import { GoogleGenAI } from "@google/genai";
 
-// In a real production app, never expose API keys on the client.
-// For this demo, we use the environment variable.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Initialize lazily to prevent errors if process.env is missing at startup
+const getAiClient = () => {
+  try {
+    // Safely check for process.env.API_KEY
+    // Ensure checking strictly for existence and string type to prevent "Invalid URL" errors in SDK
+    const apiKey = (typeof process !== 'undefined' && process && process.env && process.env.API_KEY) ? process.env.API_KEY : null;
+    
+    // Explicitly check for empty string or invalid type which causes constructor failure
+    if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
+      return null;
+    }
+    
+    return new GoogleGenAI({ apiKey });
+  } catch (error) {
+    console.error("Failed to initialize Gemini Client:", error);
+    return null;
+  }
+};
 
 export const generateProductPitch = async (productName: string, category: string): Promise<string> => {
   try {
-    if (!process.env.API_KEY) {
+    const ai = getAiClient();
+    
+    if (!ai) {
       return "AI features require an API Key. Please configure your environment.";
     }
 
@@ -27,7 +45,8 @@ export const generateProductPitch = async (productName: string, category: string
 
 export const generateStylingAdvice = async (productName: string): Promise<string> => {
   try {
-    if (!process.env.API_KEY) return "AI Assistant unavailable.";
+    const ai = getAiClient();
+    if (!ai) return "AI Assistant unavailable.";
     
     const model = 'gemini-2.5-flash';
     const prompt = `Suggest 3 matching items or colors to wear with a "${productName}". Keep it bulleted and concise.`;
