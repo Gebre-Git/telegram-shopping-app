@@ -1,3 +1,9 @@
+export interface ProductDetails {
+  material: string;
+  fit: string;
+  care: string;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -5,6 +11,7 @@ export interface Product {
   image: string;
   category: string;
   description: string;
+  details?: ProductDetails;
 }
 
 export interface CartItem extends Product {
@@ -39,17 +46,6 @@ declare global {
       WebApp: {
         ready: () => void;
         expand: () => void;
-        themeParams: {
-          bg_color?: string;
-          text_color?: string;
-          hint_color?: string;
-          link_color?: string;
-          button_color?: string;
-          button_text_color?: string;
-        };
-        HapticFeedback: {
-          impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
-        };
         initDataUnsafe?: {
           user?: {
             first_name?: string;
@@ -57,6 +53,26 @@ declare global {
             username?: string;
             id?: number;
           };
+        };
+        themeParams: {
+          bg_color?: string;
+          text_color?: string;
+          hint_color?: string;
+          link_color?: string;
+          button_color?: string;
+          button_text_color?: string;
+          secondary_bg_color?: string;
+        };
+        // Added BackButton definition to fix missing property errors
+        BackButton: {
+          isVisible: boolean;
+          onClick: (callback: () => void) => void;
+          offClick: (callback: () => void) => void;
+          show: () => void;
+          hide: () => void;
+        };
+        HapticFeedback: {
+          impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
         };
         showPopup: (params: {
           title: string;
