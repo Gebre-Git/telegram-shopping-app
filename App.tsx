@@ -4,6 +4,11 @@ import { Product, Order, OrderStatus } from './types';
 import { ShoppingCart, Search, Menu, Star, Upload, Check, Loader2, Lock, ArrowLeft, Package, X } from 'lucide-react';
 import axios from 'axios';
 
+// --- CONFIGURATION ---
+// REPLACE THIS WITH YOUR DEPLOYED RAILWAY BACKEND URL
+// Example: const API_URL = 'https://s-shop-backend.up.railway.app';
+const API_URL = 'http://localhost:5000'; 
+
 // --- Mock Data (Amazon Style) ---
 const PRODUCTS: Product[] = [
   { id: 1, name: 'Wireless Noise Cancelling Headphones', price: 299.99, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80', rating: 4.8, reviews: 2450 },
@@ -40,7 +45,7 @@ const App: React.FC = () => {
   const safeShowAlert = (message: string) => {
     const tg = window.Telegram?.WebApp;
     // showAlert requires version 6.2+. 
-    // In version 6.0, window.alert is overridden but sometimes buggy (calls showPopup which doesn't exist).
+    // In version 6.0, window.alert is overridden but sometimes buggy.
     // We use a custom modal fallback to be safe.
     if (tg && tg.isVersionAtLeast && tg.isVersionAtLeast('6.2')) {
       tg.showAlert(message);
@@ -163,7 +168,7 @@ const App: React.FC = () => {
       const userName = tgUser?.first_name || 'Web Guest';
 
       try {
-        await axios.post('/api/order', {
+        await axios.post(`${API_URL}/api/orders/create`, {
           items: [{ ...selectedProduct, quantity: 1 }],
           total: selectedProduct.price,
           screenshot,
@@ -178,7 +183,7 @@ const App: React.FC = () => {
         setSelectedProduct(null);
       } catch (error) {
         console.error(error);
-        safeShowAlert("Failed to place order. Please try again.");
+        safeShowAlert("Failed to place order. Please check your connection.");
       } finally {
         setIsSubmitting(false);
       }
@@ -304,7 +309,7 @@ const App: React.FC = () => {
     const fetchOrders = async () => {
       setLoadingOrders(true);
       try {
-        const res = await axios.get('/api/get-orders');
+        const res = await axios.get(`${API_URL}/api/orders`);
         setOrders(res.data);
       } catch (err) {
         console.error(err);
@@ -316,7 +321,7 @@ const App: React.FC = () => {
 
     const confirmOrder = async (orderId: string, userId: string) => {
       try {
-        await axios.post('/api/confirm', { orderId, telegramUserId: userId });
+        await axios.post(`${API_URL}/api/orders/confirm`, { orderId, telegramUserId: userId });
         safeShowAlert("Order Confirmed & Notification Sent!");
         fetchOrders();
       } catch (err) {

@@ -1,44 +1,38 @@
-
-const axios = require('axios');
+const axios = require("axios");
 
 module.exports = async (req, res) => {
-  // CORS wrappers (generic for Vercel functions)
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  if (req.method === "POST") {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const update = req.body;
 
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const { message } = req.body;
+    // Ignore messages without text
+    if (!update.message) {
+      return res.status(200).send("OK");
+    }
 
-  if (!message || !message.text) {
-    // Just return 200 to acknowledge receipt to Telegram
-    return res.status(200).json({ status: 'ok' });
-  }
+    const chatId = update.message.chat.id;
+    const text = update.message.text;
 
-  const chatId = message.chat.id;
-  const text = message.text;
-
-  try {
-    if (text === '/start') {
-      // Send the button that opens the Mini App
+    // Handle /start
+    if (text === "/start") {
       await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         chat_id: chatId,
-        text: "Welcome to S-Shop! 🛍️\n\nClick the button below to browse our Amazon-style store and place your order.",
+        text: "Welcome to S-Shop! 🛒\nClick below to enter the shop.",
         reply_markup: {
-          inline_keyboard: [[
-            {
-              text: "🛒 Open Shop",
-              web_app: { url: "https://s-shopping.vercel.app" }
-            }
-          ]]
+          inline_keyboard: [
+            [
+              {
+                text: "🛍 OPEN SHOP",
+                web_app: { url: "https://s-shopping.vercel.app" }
+              }
+            ]
+          ]
         }
       });
     }
-    
-    res.status(200).json({ status: 'ok' });
-  } catch (error) {
-    console.error('Webhook error:', error.message);
-    res.status(500).json({ error: 'Webhook failed' });
+
+    return res.status(200).send("OK");
   }
+
+  res.status(200).send("GET OK");
 };
